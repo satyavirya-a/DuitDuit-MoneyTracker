@@ -80,6 +80,35 @@ export default function History() {
     fetchTransactions();
   };
 
+  // Delete transaction handler
+  const [deletingId, setDeletingId] = useState(null);
+  const [confirmDeleteId, setConfirmDeleteId] = useState(null);
+
+  const handleDeleteTransaction = async (txId, e) => {
+    e.stopPropagation();
+    if (confirmDeleteId !== txId) {
+      setConfirmDeleteId(txId);
+      // Auto-reset after 3 seconds
+      setTimeout(() => setConfirmDeleteId((prev) => (prev === txId ? null : prev)), 3000);
+      return;
+    }
+    setDeletingId(txId);
+    try {
+      const { error } = await supabase
+        .from('transactions')
+        .delete()
+        .eq('id', txId);
+      if (error) throw error;
+      fetchTransactions();
+    } catch (err) {
+      console.error('Error deleting transaction:', err);
+      alert('Failed to delete transaction.');
+    } finally {
+      setDeletingId(null);
+      setConfirmDeleteId(null);
+    }
+  };
+
   // Group transactions by date
   const grouped = transactions.reduce((acc, tx) => {
     const key = tx.date;
@@ -198,26 +227,46 @@ export default function History() {
                 <p className="tx-group-date">{formatDateRelative(date)}</p>
                 <div className="transaction-list">
                   {txs.map((tx, i) => (
-                    <button
+                    <div
                       key={tx.id}
-                      className="transaction-item stagger-item"
-                      onClick={() => openEditModal(tx)}
+                      className="transaction-item-row stagger-item"
                       style={{ animationDelay: `${i * 0.03}s` }}
                     >
-                      <div className="tx-icon-wrapper">
-                        <span className="tx-icon">{tx.categories?.icon || '📁'}</span>
-                      </div>
-                      <div className="tx-info">
-                        <p className="tx-category">{tx.categories?.name || 'Uncategorized'}</p>
-                        <p className="tx-meta">
-                          {tx.wallets?.name || 'Wallet'}
-                          {tx.notes ? ` · ${tx.notes}` : ''}
+                      <button
+                        className="transaction-item"
+                        onClick={() => openEditModal(tx)}
+                      >
+                        <div className="tx-icon-wrapper">
+                          <span className="tx-icon">{tx.categories?.icon || '📁'}</span>
+                        </div>
+                        <div className="tx-info">
+                          <p className="tx-category">{tx.categories?.name || 'Uncategorized'}</p>
+                          <p className="tx-meta">
+                            {tx.wallets?.name || 'Wallet'}
+                            {tx.notes ? ` · ${tx.notes}` : ''}
+                          </p>
+                        </div>
+                        <p className={`tx-amount ${tx.type}`}>
+                          {tx.type === 'income' ? '+' : '−'}{formatCurrency(tx.amount).replace('Rp', '').trim()}
                         </p>
-                      </div>
-                      <p className={`tx-amount ${tx.type}`}>
-                        {tx.type === 'income' ? '+' : '−'}{formatCurrency(tx.amount).replace('Rp', '').trim()}
-                      </p>
-                    </button>
+                      </button>
+                      <button
+                        className={`tx-delete-btn ${confirmDeleteId === tx.id ? 'confirming' : ''}`}
+                        onClick={(e) => handleDeleteTransaction(tx.id, e)}
+                        disabled={deletingId === tx.id}
+                        title={confirmDeleteId === tx.id ? 'Tap again to confirm' : 'Delete'}
+                        id={`delete-tx-${tx.id}`}
+                      >
+                        {deletingId === tx.id ? (
+                          <div className="spinner" style={{ width: 14, height: 14, borderWidth: 2 }} />
+                        ) : (
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <polyline points="3 6 5 6 21 6" />
+                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                          </svg>
+                        )}
+                      </button>
+                    </div>
                   ))}
                 </div>
               </div>

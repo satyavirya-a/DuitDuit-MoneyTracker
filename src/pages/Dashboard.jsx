@@ -19,6 +19,19 @@ export default function Dashboard() {
   const [defaultType, setDefaultType] = useState('expense');
   const [fabOpen, setFabOpen] = useState(false);
 
+  // Balance visibility toggle (persisted in localStorage)
+  const [balanceHidden, setBalanceHidden] = useState(() => {
+    return localStorage.getItem('duitduit_balance_hidden') === 'true';
+  });
+
+  const toggleBalanceVisibility = () => {
+    setBalanceHidden((prev) => {
+      const next = !prev;
+      localStorage.setItem('duitduit_balance_hidden', String(next));
+      return next;
+    });
+  };
+
   const fetchData = useCallback(async () => {
     if (!user) return;
     const { start, end } = getCurrentMonthRange();
@@ -119,8 +132,31 @@ export default function Dashboard() {
         {/* Total Balance Card */}
         <div className="total-balance-card animate-fade-in-up" id="total-balance-card">
           <div className="total-balance-bg-orb" />
-          <p className="total-balance-label">Total Balance</p>
-          <h2 className="total-balance-amount">{formatCurrency(totalBalance)}</h2>
+          <div className="total-balance-top-row">
+            <p className="total-balance-label">Total Balance</p>
+            <button
+              className="balance-eye-btn"
+              onClick={toggleBalanceVisibility}
+              aria-label={balanceHidden ? 'Show balance' : 'Hide balance'}
+              id="balance-eye-btn"
+            >
+              {balanceHidden ? (
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94" />
+                  <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19" />
+                  <line x1="1" y1="1" x2="23" y2="23" />
+                </svg>
+              ) : (
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                  <circle cx="12" cy="12" r="3" />
+                </svg>
+              )}
+            </button>
+          </div>
+          <h2 className="total-balance-amount">
+            {balanceHidden ? '••••••••' : formatCurrency(totalBalance)}
+          </h2>
           <div className="monthly-summary">
             <div className="summary-item income">
               <div className="summary-icon">
@@ -131,7 +167,7 @@ export default function Dashboard() {
               </div>
               <div>
                 <p className="summary-label">Income</p>
-                <p className="summary-value">{formatCurrency(monthlyIncome)}</p>
+                <p className="summary-value">{balanceHidden ? '••••••' : formatCurrency(monthlyIncome)}</p>
               </div>
             </div>
             <div className="summary-divider" />
@@ -144,7 +180,7 @@ export default function Dashboard() {
               </div>
               <div>
                 <p className="summary-label">Expense</p>
-                <p className="summary-value">{formatCurrency(monthlyExpense)}</p>
+                <p className="summary-value">{balanceHidden ? '••••••' : formatCurrency(monthlyExpense)}</p>
               </div>
             </div>
           </div>
@@ -170,7 +206,7 @@ export default function Dashboard() {
                     <span className="wallet-icon">{wallet.icon}</span>
                     <span className="wallet-name">{wallet.name}</span>
                   </div>
-                  <p className="wallet-balance">{formatCurrency(wallet.current_balance)}</p>
+                  <p className="wallet-balance">{balanceHidden ? '••••••' : formatCurrency(wallet.current_balance)}</p>
                 </div>
               ))}
             </div>

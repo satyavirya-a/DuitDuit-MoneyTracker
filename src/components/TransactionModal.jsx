@@ -4,6 +4,27 @@ import { useAuth } from '../contexts/AuthContext';
 import { getTodayStr } from '../lib/utils';
 import './TransactionModal.css';
 
+/**
+ * Format a numeric string with Indonesian thousand separators (dots).
+ * e.g. "10000" → "10.000", "1500000" → "1.500.000"
+ */
+function formatInputAmount(value) {
+  // Strip everything that's not a digit
+  const digits = value.replace(/\D/g, '');
+  if (!digits) return '';
+  // Add thousand separators
+  return Number(digits).toLocaleString('id-ID');
+}
+
+/**
+ * Parse a formatted amount string back to a number.
+ * e.g. "1.500.000" → 1500000
+ */
+function parseAmount(formatted) {
+  if (!formatted) return 0;
+  return Number(formatted.replace(/\./g, '')) || 0;
+}
+
 export default function TransactionModal({
   isOpen,
   onClose,
@@ -49,7 +70,7 @@ export default function TransactionModal({
 
     if (transaction) {
       setType(transaction.type);
-      setAmount(String(transaction.amount));
+      setAmount(formatInputAmount(String(transaction.amount)));
       setDate(transaction.date);
       setCategoryId(transaction.category_id || '');
       setWalletId(transaction.wallet_id);
@@ -88,7 +109,7 @@ export default function TransactionModal({
     const data = {
       user_id: user.id,
       type,
-      amount: parseFloat(amount),
+      amount: parseAmount(amount),
       date,
       category_id: categoryId,
       wallet_id: walletId,
@@ -141,7 +162,7 @@ export default function TransactionModal({
 
   if (!isOpen) return null;
 
-  const isValid = amount && parseFloat(amount) > 0 && walletId && categoryId;
+  const isValid = amount && parseAmount(amount) > 0 && walletId && categoryId;
 
   return (
     <div className="modal-overlay" onClick={onClose} id="transaction-modal-overlay">
@@ -186,11 +207,11 @@ export default function TransactionModal({
         <div className="amount-section">
           <span className="amount-currency">Rp</span>
           <input
-            type="number"
+            type="text"
             className="amount-input"
             placeholder="0"
             value={amount}
-            onChange={(e) => setAmount(e.target.value)}
+            onChange={(e) => setAmount(formatInputAmount(e.target.value))}
             inputMode="numeric"
             autoFocus
             id="amount-input"

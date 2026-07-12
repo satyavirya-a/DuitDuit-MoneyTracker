@@ -74,7 +74,33 @@
   color: rgba(255, 255, 255, 0.7);
   text-transform: uppercase;
   letter-spacing: 0.08em;
+  margin-bottom: 0;
+}
+.total-balance-top-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   margin-bottom: var(--space-xs);
+}
+.balance-eye-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-sm);
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  color: rgba(255, 255, 255, 0.7);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+.balance-eye-btn:hover {
+  background: rgba(255, 255, 255, 0.18);
+  color: white;
+}
+.balance-eye-btn:active {
+  transform: scale(0.92);
 }
 .total-balance-amount {
   font-size: 2rem;

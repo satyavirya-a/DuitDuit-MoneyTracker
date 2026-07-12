@@ -132,3 +132,53 @@
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
+
+/* --- Transaction Row with Delete ---
+   Setiap baris transaksi sekarang punya tombol hapus (trash icon)
+   di sebelah kanan. Tap pertama = konfirmasi (merah), tap kedua = hapus. */
+.transaction-item-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  border-bottom: 1px solid var(--border-subtle);
+}
+.transaction-item-row:last-child {
+  border-bottom: none;
+}
+.transaction-item-row .transaction-item {
+  flex: 1;
+  min-width: 0;
+  border-bottom: none;
+}
+
+.tx-delete-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-md);
+  background: transparent;
+  border: none;
+  color: var(--text-tertiary);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: all var(--transition-fast);
+  opacity: 0.5;
+}
+.tx-delete-btn:hover {
+  opacity: 1;
+  color: var(--color-expense);
+  background: var(--color-expense-bg);
+}
+.tx-delete-btn.confirming {
+  opacity: 1;
+  color: white;
+  background: var(--color-expense);
+  animation: pulse 1s ease-in-out infinite;
+  border-radius: var(--radius-sm);
+}
+.tx-delete-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
