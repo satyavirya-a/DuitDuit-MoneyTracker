@@ -1,0 +1,19 @@
+/* ============================================
+   App Layout CSS
+   
+   KONSEP: Ini mengatur layout dasar aplikasi.
+   .app-content.with-nav mendapat padding-bottom ekstra
+   agar konten halaman tidak tertutup oleh BottomNav.
+   ============================================ */
+
+.app-content {
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+/* Saat BottomNav tampil, tambahkan ruang di bawah konten
+   agar item terakhir di halaman tidak tertutup navbar.
+   Nilainya = tinggi nav (68px) + safe area bawah (untuk iPhone notch) */
+.app-content.with-nav {
+  padding-bottom: calc(var(--nav-height) + var(--safe-bottom));
+}
