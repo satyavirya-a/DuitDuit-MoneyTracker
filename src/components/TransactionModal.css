@@ -1,0 +1,176 @@
+/* ============================================
+   Transaction Modal (Bottom Sheet Style)
+   ============================================ */
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: var(--bg-overlay);
+  z-index: 200;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  animation: fadeIn 0.2s ease-out;
+}
+
+.modal-sheet {
+  width: 100%;
+  max-width: 500px;
+  max-height: 92vh;
+  max-height: 92dvh;
+  background: var(--bg-secondary);
+  border-radius: var(--radius-2xl) var(--radius-2xl) 0 0;
+  overflow-y: auto;
+  animation: slideUp 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  padding-bottom: calc(var(--safe-bottom) + var(--space-lg));
+}
+
+/* Header */
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-md) var(--page-padding);
+  position: sticky;
+  top: 0;
+  background: var(--bg-secondary);
+  z-index: 10;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.modal-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  text-align: center;
+}
+
+.modal-close-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-md);
+  color: var(--text-secondary);
+  transition: all var(--transition-fast);
+}
+.modal-close-btn:hover {
+  background: var(--bg-card);
+  color: var(--text-primary);
+}
+
+/* Type Toggle */
+.type-toggle {
+  display: flex;
+  gap: 4px;
+  margin: var(--space-md) var(--page-padding);
+  padding: 4px;
+  background: var(--bg-primary);
+  border-radius: var(--radius-md);
+}
+
+.type-btn {
+  flex: 1;
+  padding: 10px;
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--text-tertiary);
+  transition: all var(--transition-fast);
+}
+.type-btn.active.expense {
+  background: var(--color-expense-bg);
+  color: var(--color-expense);
+  box-shadow: 0 2px 8px rgba(244, 63, 94, 0.15);
+}
+.type-btn.active.income {
+  background: var(--color-income-bg);
+  color: var(--color-income);
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.15);
+}
+
+/* Amount Section */
+.amount-section {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: var(--space-lg) var(--page-padding);
+}
+
+.amount-currency {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-tertiary);
+}
+
+.amount-input {
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  text-align: left;
+  max-width: 250px;
+  background: transparent;
+  border: none;
+  outline: none;
+  caret-color: var(--accent-primary);
+  letter-spacing: -0.02em;
+}
+.amount-input::placeholder {
+  color: var(--text-tertiary);
+  opacity: 0.4;
+}
+/* Hide number input spinners */
+.amount-input::-webkit-outer-spin-button,
+.amount-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+.amount-input[type='number'] {
+  -moz-appearance: textfield;
+}
+
+/* Form */
+.modal-form {
+  padding: 0 var(--page-padding);
+}
+
+.form-row {
+  display: flex;
+  gap: var(--space-md);
+}
+
+/* Actions */
+.modal-actions {
+  padding: var(--space-lg) var(--page-padding) 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.btn-delete-transaction {
+  width: 100%;
+  padding: 12px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--color-expense);
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+.btn-delete-transaction:hover {
+  background: var(--color-expense-bg);
+}
+.btn-delete-transaction.confirming {
+  background: var(--color-expense);
+  color: white;
+  font-weight: 600;
+  animation: pulse 1s ease-in-out infinite;
+}
+
+/* Date input styling for dark theme */
+.modal-form input[type="date"] {
+  color-scheme: dark;
+}
