@@ -18,6 +18,9 @@ dist-ssr
 .env.*.local
 client_secret*.json
 
+# AI agent preferences (personal)
+.agents/
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
