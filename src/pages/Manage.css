@@ -1,0 +1,193 @@
+/* ============================================
+   Shared Manage Pages CSS (Wallets & Categories)
+
+   KONSEP: Kedua halaman manajemen ini memiliki pola UI yang sama:
+   - Header dengan tombol back
+   - Form collapsible untuk tambah/edit
+   - List item dengan ikon, info, dan tombol delete
+   
+   Dengan CSS shared, kita menghindari duplikasi kode
+   dan menjaga konsistensi visual antar halaman.
+   ============================================ */
+
+.manage-page {
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+/* --- Category Tabs ---
+   Tab toggle mirip filter di History, tapi dengan warna
+   yang berbeda untuk Income (hijau) dan Expense (merah)
+   agar user bisa langsung membedakan secara visual. */
+.category-tabs {
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+  background: var(--bg-secondary);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-subtle);
+  margin-bottom: var(--space-lg);
+}
+
+.category-tab {
+  flex: 1;
+  padding: 10px;
+  border-radius: var(--radius-sm);
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-tertiary);
+  transition: all var(--transition-fast);
+}
+
+.category-tab.active.expense {
+  background: var(--color-expense-bg);
+  color: var(--color-expense);
+}
+
+.category-tab.active.income {
+  background: var(--color-income-bg);
+  color: var(--color-income);
+}
+
+/* --- Collapsible Form ---
+   Form ini muncul/hilang dengan animasi fadeInUp.
+   Menggunakan glass-card untuk efek glassmorphism. */
+.manage-form {
+  padding: var(--space-lg);
+  margin-bottom: var(--space-lg);
+}
+
+.manage-form-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  margin-bottom: var(--space-md);
+}
+
+.manage-form-actions {
+  display: flex;
+  gap: var(--space-sm);
+  margin-top: var(--space-md);
+}
+
+/* --- Icon Picker ---
+   Grid emoji yang bisa dipilih. Ikon aktif mendapatkan
+   border accent dan background glow. */
+.icon-picker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.icon-option {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  border-radius: var(--radius-sm);
+  border: 1.5px solid var(--border-subtle);
+  background: var(--bg-primary);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.icon-option:hover {
+  border-color: var(--border-accent);
+  background: var(--bg-card);
+}
+
+.icon-option.active {
+  border-color: var(--accent-primary);
+  background: var(--accent-glow);
+  box-shadow: 0 0 8px var(--accent-glow);
+  transform: scale(1.1);
+}
+
+/* --- List Items ---
+   Setiap item berisi: ikon, info (nama + detail), tombol delete.
+   Klik pada ikon/info membuka form edit.
+   Klik tombol delete menghapus item. */
+.manage-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.manage-list-item {
+  display: flex;
+  align-items: center;
+  padding: 14px var(--space-md);
+  transition: border-color var(--transition-fast);
+}
+
+.manage-list-item:hover {
+  border-color: var(--border-accent);
+}
+
+.manage-item-content {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  flex: 1;
+  min-width: 0;
+  cursor: pointer;
+}
+
+.manage-item-icon {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+  width: 36px;
+  text-align: center;
+}
+
+.manage-item-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.manage-item-name {
+  font-size: 0.95rem;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.manage-item-detail {
+  font-size: 0.8rem;
+  color: var(--text-tertiary);
+  margin-top: 2px;
+}
+
+/* --- Delete Button ---
+   Menggunakan pola "double-tap to confirm":
+   - State normal: ikon trash, warna muted
+   - State confirming: teks "Confirm?", warna merah, animasi pulse */
+.manage-delete-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-sm);
+  color: var(--text-tertiary);
+  flex-shrink: 0;
+  transition: all var(--transition-fast);
+  cursor: pointer;
+}
+
+.manage-delete-btn:hover {
+  color: var(--color-expense);
+  background: var(--color-expense-bg);
+}
+
+.manage-delete-btn.confirming {
+  width: auto;
+  padding: 0 10px;
+  background: var(--color-expense);
+  color: white;
+  font-weight: 600;
+  animation: pulse 1s ease-in-out infinite;
+  border-radius: var(--radius-full);
+}

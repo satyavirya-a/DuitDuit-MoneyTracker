@@ -1,0 +1,134 @@
+/* ============================================
+   History Page
+   ============================================ */
+
+.history-page {
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+/* --- Filter Tabs ---
+   Filter tabs menggunakan pola "pill selector" — tombol horizontal
+   yang menunjukkan filter mana yang aktif. Ini adalah pola UI yang
+   sangat umum di aplikasi mobile karena mudah dijangkau ibu jari. */
+.history-filters {
+  padding: 0 var(--page-padding);
+  margin-bottom: var(--space-md);
+}
+
+.filter-tabs {
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+  background: var(--bg-secondary);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-subtle);
+}
+
+.filter-tab {
+  flex: 1;
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-tertiary);
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+}
+
+/* Active state menggunakan gradient untuk konsistensi visual
+   dengan komponen lain (FAB, balance card, dll) */
+.filter-tab.active {
+  background: var(--accent-gradient);
+  color: white;
+  box-shadow: var(--shadow-sm);
+}
+
+/* --- Custom Month Picker ---
+   Muncul hanya saat user memilih filter "Custom".
+   Menggunakan 2 select: bulan dan tahun */
+.custom-month-picker {
+  display: flex;
+  gap: var(--space-sm);
+  margin-top: var(--space-md);
+}
+
+.month-select {
+  flex: 2;
+}
+
+.year-select {
+  flex: 1;
+}
+
+/* --- Period Summary ---
+   Ringkasan cepat untuk periode yang dipilih.
+   Menggunakan 3 kolom: Income, Expense, Net.
+   "Net" = Income - Expense, menunjukkan cash flow bersih */
+.history-summary {
+  display: flex;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-lg);
+}
+
+.history-summary-item {
+  flex: 1;
+  padding: 12px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  text-align: center;
+}
+
+.history-summary-label {
+  display: block;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 4px;
+}
+
+.history-summary-value {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.history-summary-value.income {
+  color: var(--color-income);
+}
+
+.history-summary-value.expense {
+  color: var(--color-expense);
+}
+
+/* --- Transaction Groups ---
+   Transaksi dikelompokkan berdasarkan tanggal.
+   Ini memudahkan user melihat pola pengeluaran per hari. */
+.transaction-groups {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+}
+
+.tx-group {
+  /* Setiap grup punya header tanggal yang "sticky" —
+     tetap terlihat saat scroll agar user selalu tahu
+     mereka sedang melihat transaksi tanggal berapa */
+}
+
+.tx-group-date {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  margin-bottom: var(--space-sm);
+  padding-bottom: var(--space-xs);
+  border-bottom: 1px solid var(--border-subtle);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}

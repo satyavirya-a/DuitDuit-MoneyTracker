@@ -1,0 +1,153 @@
+/* ============================================
+   Settings Page
+   ============================================ */
+
+.settings-page {
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+/* --- Profile Card ---
+   Menampilkan info user dari Google OAuth.
+   Menggunakan glass-card (glassmorphism) untuk kesan premium. */
+.settings-profile-card {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-lg);
+  margin-bottom: var(--space-lg);
+}
+
+.settings-avatar {
+  width: 56px;
+  height: 56px;
+  border-radius: var(--radius-full);
+  overflow: hidden;
+  background: var(--accent-gradient);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border: 2px solid var(--border-accent);
+}
+
+.settings-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.settings-avatar span {
+  font-weight: 700;
+  font-size: 1.3rem;
+  color: white;
+}
+
+.settings-user-name {
+  font-size: 1.15rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  margin-bottom: 2px;
+}
+
+.settings-user-email {
+  font-size: 0.85rem;
+  color: var(--text-tertiary);
+  word-break: break-all;
+}
+
+/* --- Settings Section --- */
+.settings-section {
+  margin-bottom: var(--space-lg);
+}
+
+/* --- Menu List ---
+   Pola "list menu" standar untuk settings.
+   Setiap item adalah tombol dengan ikon, teks, dan chevron kanan. */
+.settings-menu {
+  overflow: hidden;
+}
+
+.settings-menu-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 16px var(--space-md);
+  text-align: left;
+  transition: background var(--transition-fast);
+  cursor: pointer;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.settings-menu-item:last-child {
+  border-bottom: none;
+}
+
+.settings-menu-item:active {
+  background: var(--bg-card-hover);
+}
+
+.menu-item-left {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+.menu-item-icon {
+  font-size: 1.4rem;
+  width: 36px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.menu-item-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  margin-bottom: 2px;
+}
+
+.menu-item-desc {
+  font-size: 0.78rem;
+  color: var(--text-tertiary);
+}
+
+.menu-chevron {
+  color: var(--text-tertiary);
+  flex-shrink: 0;
+}
+
+/* --- Sign Out Button --- */
+.settings-signout-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  width: 100%;
+  padding: 14px;
+  background: var(--color-expense-bg);
+  color: var(--color-expense);
+  font-weight: 600;
+  font-size: 0.95rem;
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(244, 63, 94, 0.15);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.settings-signout-btn:hover {
+  background: rgba(244, 63, 94, 0.18);
+}
+
+.settings-signout-btn:active {
+  transform: scale(0.98);
+}
+
+/* --- Footer --- */
+.settings-footer {
+  text-align: center;
+  font-size: 0.75rem;
+  color: var(--text-tertiary);
+  padding: var(--space-xl) 0;
+  opacity: 0.6;
+}
