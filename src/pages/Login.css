@@ -1,0 +1,139 @@
+/* ============================================
+   Login Page
+   ============================================ */
+
+.login-page {
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  padding: var(--space-lg);
+}
+
+/* Background orbs */
+.login-bg-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.3;
+  pointer-events: none;
+}
+.login-bg-orb-1 {
+  width: 300px;
+  height: 300px;
+  background: var(--accent-primary);
+  top: -80px;
+  right: -60px;
+  animation: pulse 8s ease-in-out infinite;
+}
+.login-bg-orb-2 {
+  width: 250px;
+  height: 250px;
+  background: var(--accent-secondary);
+  bottom: -60px;
+  left: -60px;
+  animation: pulse 10s ease-in-out infinite reverse;
+}
+.login-bg-orb-3 {
+  width: 180px;
+  height: 180px;
+  background: var(--color-income);
+  top: 40%;
+  left: 50%;
+  opacity: 0.15;
+  animation: pulse 12s ease-in-out infinite;
+}
+
+/* Content */
+.login-content {
+  width: 100%;
+  max-width: 380px;
+  text-align: center;
+  position: relative;
+  z-index: 1;
+}
+
+/* Brand */
+.login-brand {
+  margin-bottom: var(--space-xl);
+}
+.login-logo {
+  display: inline-flex;
+  margin-bottom: var(--space-md);
+}
+.login-title {
+  font-size: 2.2rem;
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  background: var(--accent-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: var(--space-sm);
+}
+.login-subtitle {
+  font-size: 1.05rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+/* Features */
+.login-features {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-xl);
+}
+.login-feature {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding: 12px 16px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  backdrop-filter: blur(8px);
+}
+.login-feature-icon {
+  font-size: 1.2rem;
+  flex-shrink: 0;
+}
+
+/* Google Button */
+.google-sign-in-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  width: 100%;
+  padding: 16px 24px;
+  background: white;
+  color: #1f1f1f;
+  font-weight: 600;
+  font-size: 1rem;
+  border-radius: var(--radius-md);
+  border: none;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  box-shadow: var(--shadow-md);
+  margin-bottom: var(--space-lg);
+}
+.google-sign-in-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+.google-sign-in-btn:active {
+  transform: translateY(0) scale(0.98);
+}
+
+/* Disclaimer */
+.login-disclaimer {
+  font-size: 0.75rem;
+  color: var(--text-tertiary);
+  line-height: 1.5;
+}
