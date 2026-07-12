@@ -104,12 +104,42 @@ export default function TransactionModal({
 
   const handleSave = async () => {
     if (!amount || !walletId || !categoryId) return;
+    
+    const parsedAmount = parseAmount(amount);
+
+    // --- VALIDASI SALDO ---
+    // Mencegah pengeluaran jika saldo tidak cukup
+    if (type === 'expense') {
+      const selectedWallet = wallets.find((w) => w.id === walletId);
+      if (selectedWallet) {
+        let availableBalance = selectedWallet.current_balance;
+        
+        // Jika sedang edit transaksi
+        if (isEditing) {
+          // Jika wallet-nya sama dan sebelumnya juga expense, kita "kembalikan" dulu 
+          // nominal lama ke saldo tersedia untuk dicek dengan nominal baru
+          if (transaction.wallet_id === walletId && transaction.type === 'expense') {
+            availableBalance += transaction.amount;
+          }
+          // Jika sebelumnya income, berarti saldo asli akan berkurang saat income dibatalkan/diubah
+          else if (transaction.wallet_id === walletId && transaction.type === 'income') {
+            availableBalance -= transaction.amount;
+          }
+        }
+
+        if (parsedAmount > availableBalance) {
+          alert(`Saldo wallet tidak mencukupi!\nSaldo tersedia: Rp ${formatInputAmount(String(availableBalance))}`);
+          return; // Hentikan proses save
+        }
+      }
+    }
+
     setSaving(true);
 
     const data = {
       user_id: user.id,
       type,
-      amount: parseAmount(amount),
+      amount: parsedAmount,
       date,
       category_id: categoryId,
       wallet_id: walletId,
