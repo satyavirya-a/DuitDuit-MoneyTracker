@@ -15,6 +15,7 @@ create table public.wallets (
   id uuid default uuid_generate_v4() primary key,
   user_id uuid references auth.users(id) on delete cascade not null,
   name text not null,
+  type text not null default 'bank' check (type in ('cash', 'e-wallet', 'bank')),
   initial_balance numeric default 0 not null,
   current_balance numeric default 0 not null,
   icon text default '💳',
@@ -36,8 +37,9 @@ create table public.transactions (
   id uuid default uuid_generate_v4() primary key,
   user_id uuid references auth.users(id) on delete cascade not null,
   wallet_id uuid references public.wallets(id) on delete cascade not null,
+  to_wallet_id uuid references public.wallets(id) on delete cascade,
   category_id uuid references public.categories(id) on delete set null,
-  type text not null check (type in ('income', 'expense')),
+  type text not null check (type in ('income', 'expense', 'transfer')),
   amount numeric not null check (amount > 0),
   date date not null default current_date,
   notes text default '',
@@ -103,16 +105,22 @@ begin
   if (TG_OP = 'INSERT') then
     if NEW.type = 'income' then
       update public.wallets set current_balance = current_balance + NEW.amount where id = NEW.wallet_id;
-    else
+    elsif NEW.type = 'expense' then
       update public.wallets set current_balance = current_balance - NEW.amount where id = NEW.wallet_id;
+    elsif NEW.type = 'transfer' then
+      update public.wallets set current_balance = current_balance - NEW.amount where id = NEW.wallet_id;
+      update public.wallets set current_balance = current_balance + NEW.amount where id = NEW.to_wallet_id;
     end if;
     return NEW;
 
   elsif (TG_OP = 'DELETE') then
     if OLD.type = 'income' then
       update public.wallets set current_balance = current_balance - OLD.amount where id = OLD.wallet_id;
-    else
+    elsif OLD.type = 'expense' then
       update public.wallets set current_balance = current_balance + OLD.amount where id = OLD.wallet_id;
+    elsif OLD.type = 'transfer' then
+      update public.wallets set current_balance = current_balance + OLD.amount where id = OLD.wallet_id;
+      update public.wallets set current_balance = current_balance - OLD.amount where id = OLD.to_wallet_id;
     end if;
     return OLD;
 
@@ -120,14 +128,20 @@ begin
     -- Reverse old transaction from old wallet
     if OLD.type = 'income' then
       update public.wallets set current_balance = current_balance - OLD.amount where id = OLD.wallet_id;
-    else
+    elsif OLD.type = 'expense' then
       update public.wallets set current_balance = current_balance + OLD.amount where id = OLD.wallet_id;
+    elsif OLD.type = 'transfer' then
+      update public.wallets set current_balance = current_balance + OLD.amount where id = OLD.wallet_id;
+      update public.wallets set current_balance = current_balance - OLD.amount where id = OLD.to_wallet_id;
     end if;
     -- Apply new transaction to new wallet (handles wallet changes too)
     if NEW.type = 'income' then
       update public.wallets set current_balance = current_balance + NEW.amount where id = NEW.wallet_id;
-    else
+    elsif NEW.type = 'expense' then
       update public.wallets set current_balance = current_balance - NEW.amount where id = NEW.wallet_id;
+    elsif NEW.type = 'transfer' then
+      update public.wallets set current_balance = current_balance - NEW.amount where id = NEW.wallet_id;
+      update public.wallets set current_balance = current_balance + NEW.amount where id = NEW.to_wallet_id;
     end if;
     return NEW;
   end if;

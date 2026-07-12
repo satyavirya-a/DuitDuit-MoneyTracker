@@ -40,6 +40,7 @@ export default function ManageWallets() {
   const [showForm, setShowForm] = useState(false);
   const [editingWallet, setEditingWallet] = useState(null);
   const [name, setName] = useState('');
+  const [type, setType] = useState('bank');
   const [initialBalance, setInitialBalance] = useState('');
   const [icon, setIcon] = useState('💳');
   const [saving, setSaving] = useState(false);
@@ -77,6 +78,7 @@ export default function ManageWallets() {
   const openAddForm = () => {
     setEditingWallet(null);
     setName('');
+    setType('bank');
     setInitialBalance('');
     setIcon('💳');
     setShowForm(true);
@@ -89,6 +91,7 @@ export default function ManageWallets() {
   const openEditForm = (wallet) => {
     setEditingWallet(wallet);
     setName(wallet.name);
+    setType(wallet.type || 'bank');
     setInitialBalance(String(wallet.initial_balance));
     setIcon(wallet.icon || '💳');
     setShowForm(true);
@@ -126,6 +129,7 @@ export default function ManageWallets() {
           .from('wallets')
           .update({
             name: name.trim(),
+            type,
             initial_balance: newInitial,
             // Sesuaikan current_balance berdasarkan perubahan initial
             current_balance: editingWallet.current_balance + balanceDiff,
@@ -141,6 +145,7 @@ export default function ManageWallets() {
         const { error } = await supabase.from('wallets').insert({
           user_id: user.id,
           name: name.trim(),
+          type,
           initial_balance: balance,
           current_balance: balance,
           icon,
@@ -240,6 +245,20 @@ export default function ManageWallets() {
                 onChange={(e) => setName(e.target.value)}
                 id="wallet-name-input"
               />
+            </div>
+
+            <div className="form-group">
+              <label className="form-label">Type</label>
+              <select
+                className="form-select"
+                value={type}
+                onChange={(e) => setType(e.target.value)}
+                id="wallet-type-select"
+              >
+                <option value="bank">Bank</option>
+                <option value="e-wallet">E-Wallet</option>
+                <option value="cash">Cash</option>
+              </select>
             </div>
 
             <div className="form-group">

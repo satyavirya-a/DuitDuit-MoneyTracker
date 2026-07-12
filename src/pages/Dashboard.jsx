@@ -65,7 +65,8 @@ export default function Dashboard() {
         let income = 0, expense = 0;
         monthTxRes.data.forEach((t) => {
           if (t.type === 'income') income += Number(t.amount);
-          else expense += Number(t.amount);
+          else if (t.type === 'expense') expense += Number(t.amount);
+          // Transfer is ignored for monthly income/expense totals
         });
         setMonthlyIncome(income);
         setMonthlyExpense(expense);

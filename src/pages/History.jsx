@@ -16,6 +16,7 @@ export default function History() {
   const [transactions, setTransactions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeFilter, setActiveFilter] = useState('1d');
+  const [wallets, setWallets] = useState({});
 
   // Custom month picker
   const now = new Date();
@@ -237,12 +238,16 @@ export default function History() {
                         onClick={() => openEditModal(tx)}
                       >
                         <div className="tx-icon-wrapper">
-                          <span className="tx-icon">{tx.categories?.icon || '📁'}</span>
+                          <span className="tx-icon">{tx.type === 'transfer' ? '💸' : (tx.categories?.icon || '📁')}</span>
                         </div>
                         <div className="tx-info">
-                          <p className="tx-category">{tx.categories?.name || 'Uncategorized'}</p>
+                          <p className="tx-category">
+                            {tx.type === 'transfer' ? 'Transfer / Pindah Dana' : (tx.categories?.name || 'Uncategorized')}
+                          </p>
                           <p className="tx-meta">
-                            {tx.wallets?.name || 'Wallet'}
+                            {tx.type === 'transfer' 
+                              ? `${tx.wallets?.name || 'Source'} → ${wallets[tx.to_wallet_id]?.name || 'Target'}`
+                              : (tx.wallets?.name || 'Wallet')}
                             {tx.notes ? ` · ${tx.notes}` : ''}
                           </p>
                         </div>

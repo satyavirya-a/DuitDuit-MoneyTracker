@@ -174,3 +174,39 @@
 .modal-form input[type="date"] {
   color-scheme: dark;
 }
+
+/* Sub-type Pills */
+.subtype-pills {
+  display: flex;
+  gap: 8px;
+  margin: 0 var(--page-padding) var(--space-md);
+  overflow-x: auto;
+  padding-bottom: 4px;
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+.subtype-pills::-webkit-scrollbar {
+  display: none;
+}
+
+.subtype-pill {
+  flex: 0 0 auto;
+  padding: 6px 14px;
+  border-radius: var(--radius-full);
+  font-size: 0.8rem;
+  font-weight: 600;
+  background: var(--bg-card);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-subtle);
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+}
+.subtype-pill:hover {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+}
+.subtype-pill.active {
+  background: var(--accent-primary-transparent);
+  color: var(--accent-primary);
+  border-color: var(--accent-primary);
+}

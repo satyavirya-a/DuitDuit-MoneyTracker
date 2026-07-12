@@ -35,11 +35,14 @@ export default function TransactionModal({
   const { user } = useAuth();
   const isEditing = !!transaction;
 
-  const [type, setType] = useState(defaultType);
+  const [type, setType] = useState(defaultType); // 'income' | 'expense'
+  const [subType, setSubType] = useState('biasa'); // 'biasa', 'pindah', 'topup', 'withdraw'
+  
   const [amount, setAmount] = useState('');
   const [date, setDate] = useState(getTodayStr());
   const [categoryId, setCategoryId] = useState('');
   const [walletId, setWalletId] = useState('');
+  const [toWalletId, setToWalletId] = useState('');
   const [notes, setNotes] = useState('');
 
   const [categories, setCategories] = useState([]);
@@ -69,18 +72,32 @@ export default function TransactionModal({
     setConfirmDelete(false);
 
     if (transaction) {
-      setType(transaction.type);
+      if (transaction.type === 'transfer') {
+        setType('expense');
+        // Let's determine subType by finding the target wallet
+        // Wait, we need the wallets data to be loaded first to know the type
+        // For simplicity, default to 'pindah' for transfers when editing, unless we know it's a topup
+        setSubType('pindah');
+        setToWalletId(transaction.to_wallet_id || '');
+        setCategoryId('');
+      } else {
+        setType(transaction.type);
+        setSubType('biasa');
+        setToWalletId('');
+        setCategoryId(transaction.category_id || '');
+      }
       setAmount(formatInputAmount(String(transaction.amount)));
       setDate(transaction.date);
-      setCategoryId(transaction.category_id || '');
       setWalletId(transaction.wallet_id);
       setNotes(transaction.notes || '');
     } else {
       setType(defaultType);
+      setSubType('biasa');
       setAmount('');
       setDate(getTodayStr());
       setCategoryId('');
       setWalletId('');
+      setToWalletId('');
       setNotes('');
     }
   }, [isOpen, transaction, defaultType]);
@@ -92,36 +109,68 @@ export default function TransactionModal({
     }
   }, [wallets, walletId, isEditing]);
 
-  // Auto-select first matching category
+  // Handle changing type
+  const handleTypeChange = (newType) => {
+    setType(newType);
+    if (newType === 'income') {
+      setSubType('biasa');
+    }
+  };
+
+  // Auto-select category if none selected
   useEffect(() => {
     const filtered = categories.filter((c) => c.type === type);
-    if (!isEditing && filtered.length > 0) {
-      setCategoryId(filtered[0].id);
+    if (!isEditing && subType === 'biasa' && filtered.length > 0) {
+      // only auto-set if empty or invalid
+      if (!categoryId || !filtered.find(c => c.id === categoryId)) {
+        setCategoryId(filtered[0].id);
+      }
     }
-  }, [type, categories, isEditing]);
+  }, [type, subType, categories, isEditing, categoryId]);
 
   const filteredCategories = categories.filter((c) => c.type === type);
+  
+  const isTransfer = type === 'expense' && subType !== 'biasa';
+  
+  // Filter Target Wallets based on subType
+  const targetWallets = wallets.filter(w => {
+    if (w.id === walletId) return false; // Cannot transfer to same wallet
+    if (subType === 'topup') return w.type === 'e-wallet';
+    if (subType === 'withdraw') return w.type === 'cash';
+    if (subType === 'pindah') return w.type === 'bank';
+    return true;
+  });
+
+  // Auto-select target wallet
+  useEffect(() => {
+    if (isTransfer && !isEditing) {
+      if (targetWallets.length > 0 && (!toWalletId || !targetWallets.find(w => w.id === toWalletId))) {
+        setToWalletId(targetWallets[0].id);
+      }
+    }
+  }, [isTransfer, isEditing, targetWallets, toWalletId]);
 
   const handleSave = async () => {
-    if (!amount || !walletId || !categoryId) return;
+    if (!amount || !walletId) return;
+    if (!isTransfer && !categoryId) return;
+    if (isTransfer && (!toWalletId || walletId === toWalletId)) {
+      alert('Silakan pilih dompet tujuan yang valid.');
+      return;
+    }
     
     const parsedAmount = parseAmount(amount);
+    const dbType = isTransfer ? 'transfer' : type;
 
     // --- VALIDASI SALDO ---
-    // Mencegah pengeluaran jika saldo tidak cukup
-    if (type === 'expense') {
+    if (dbType === 'expense' || dbType === 'transfer') {
       const selectedWallet = wallets.find((w) => w.id === walletId);
       if (selectedWallet) {
         let availableBalance = selectedWallet.current_balance;
         
-        // Jika sedang edit transaksi
         if (isEditing) {
-          // Jika wallet-nya sama dan sebelumnya juga expense, kita "kembalikan" dulu 
-          // nominal lama ke saldo tersedia untuk dicek dengan nominal baru
-          if (transaction.wallet_id === walletId && transaction.type === 'expense') {
+          if (transaction.wallet_id === walletId && (transaction.type === 'expense' || transaction.type === 'transfer')) {
             availableBalance += transaction.amount;
           }
-          // Jika sebelumnya income, berarti saldo asli akan berkurang saat income dibatalkan/diubah
           else if (transaction.wallet_id === walletId && transaction.type === 'income') {
             availableBalance -= transaction.amount;
           }
@@ -129,7 +178,7 @@ export default function TransactionModal({
 
         if (parsedAmount > availableBalance) {
           alert(`Saldo wallet tidak mencukupi!\nSaldo tersedia: Rp ${formatInputAmount(String(availableBalance))}`);
-          return; // Hentikan proses save
+          return;
         }
       }
     }
@@ -138,13 +187,20 @@ export default function TransactionModal({
 
     const data = {
       user_id: user.id,
-      type,
+      type: dbType,
       amount: parsedAmount,
       date,
-      category_id: categoryId,
       wallet_id: walletId,
       notes: notes.trim(),
     };
+
+    if (isTransfer) {
+      data.to_wallet_id = toWalletId;
+      data.category_id = null;
+    } else {
+      data.category_id = categoryId;
+      data.to_wallet_id = null;
+    }
 
     try {
       if (isEditing) {
@@ -192,7 +248,7 @@ export default function TransactionModal({
 
   if (!isOpen) return null;
 
-  const isValid = amount && parseAmount(amount) > 0 && walletId && categoryId;
+  const isValid = amount && parseAmount(amount) > 0 && walletId && (isTransfer ? toWalletId : categoryId);
 
   return (
     <div className="modal-overlay" onClick={onClose} id="transaction-modal-overlay">
@@ -201,7 +257,6 @@ export default function TransactionModal({
         onClick={(e) => e.stopPropagation()}
         id="transaction-modal"
       >
-        {/* Header */}
         <div className="modal-header">
           <button className="modal-close-btn" onClick={onClose} id="modal-close-btn">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
@@ -219,19 +274,29 @@ export default function TransactionModal({
         <div className="type-toggle" id="type-toggle">
           <button
             className={`type-btn ${type === 'expense' ? 'active expense' : ''}`}
-            onClick={() => setType('expense')}
+            onClick={() => handleTypeChange('expense')}
             id="type-expense-btn"
           >
             Expense
           </button>
           <button
             className={`type-btn ${type === 'income' ? 'active income' : ''}`}
-            onClick={() => setType('income')}
+            onClick={() => handleTypeChange('income')}
             id="type-income-btn"
           >
             Income
           </button>
         </div>
+
+        {/* Sub-type Toggle for Expense */}
+        {type === 'expense' && (
+          <div className="subtype-pills">
+            <button className={`subtype-pill ${subType === 'biasa' ? 'active' : ''}`} onClick={() => setSubType('biasa')}>Pengeluaran</button>
+            <button className={`subtype-pill ${subType === 'pindah' ? 'active' : ''}`} onClick={() => setSubType('pindah')}>Pindah Dana</button>
+            <button className={`subtype-pill ${subType === 'topup' ? 'active' : ''}`} onClick={() => setSubType('topup')}>Top Up</button>
+            <button className={`subtype-pill ${subType === 'withdraw' ? 'active' : ''}`} onClick={() => setSubType('withdraw')}>Withdraw</button>
+          </div>
+        )}
 
         {/* Amount Input */}
         <div className="amount-section">
@@ -262,25 +327,44 @@ export default function TransactionModal({
           </div>
 
           <div className="form-row">
-            <div className="form-group" style={{ flex: 1 }}>
-              <label className="form-label">Category</label>
-              <select
-                className="form-select"
-                value={categoryId}
-                onChange={(e) => setCategoryId(e.target.value)}
-                id="category-select"
-              >
-                <option value="">Select</option>
-                {filteredCategories.map((cat) => (
-                  <option key={cat.id} value={cat.id}>
-                    {cat.icon} {cat.name}
-                  </option>
-                ))}
-              </select>
-            </div>
+            {!isTransfer ? (
+              <div className="form-group" style={{ flex: 1 }}>
+                <label className="form-label">Category</label>
+                <select
+                  className="form-select"
+                  value={categoryId}
+                  onChange={(e) => setCategoryId(e.target.value)}
+                  id="category-select"
+                >
+                  <option value="">Select</option>
+                  {filteredCategories.map((cat) => (
+                    <option key={cat.id} value={cat.id}>
+                      {cat.icon} {cat.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            ) : (
+              <div className="form-group" style={{ flex: 1 }}>
+                <label className="form-label">Target Wallet</label>
+                <select
+                  className="form-select"
+                  value={toWalletId}
+                  onChange={(e) => setToWalletId(e.target.value)}
+                  id="target-wallet-select"
+                >
+                  <option value="">Select Target</option>
+                  {targetWallets.map((w) => (
+                    <option key={w.id} value={w.id}>
+                      {w.icon} {w.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
 
             <div className="form-group" style={{ flex: 1 }}>
-              <label className="form-label">Wallet</label>
+              <label className="form-label">{isTransfer ? 'Source Wallet' : 'Wallet'}</label>
               <select
                 className="form-select"
                 value={walletId}
